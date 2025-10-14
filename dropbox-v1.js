@@ -1431,7 +1431,7 @@ if (window.typingMindCloudSync) {
       }
 
       // Initialize Dropbox client
-      this.client = new Dropbox({ accessToken, fetch });
+      this.client = new Dropbox.Dropbox({ accessToken, fetch });
 
       this.logger.log("success", "Dropbox client initialized");
     }
@@ -1585,7 +1585,7 @@ if (window.typingMindCloudSync) {
           // Ensure we have a valid token
           if (this.auth) {
             const accessToken = await this.auth.getValidToken();
-            this.client = new Dropbox({ accessToken, fetch });
+            this.client = new Dropbox.Dropbox({ accessToken, fetch });
           }
 
           // Upload to Dropbox
@@ -1626,7 +1626,7 @@ if (window.typingMindCloudSync) {
 
           if (this.auth) {
             const accessToken = await this.auth.getValidToken();
-            this.client = new Dropbox({ accessToken, fetch });
+            this.client = new Dropbox.Dropbox({ accessToken, fetch });
           }
 
           const result = await this.client.filesUpload({
@@ -1664,7 +1664,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         const result = await this.client.filesDownload({ path });
@@ -1694,7 +1694,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         const result = await this.client.filesDownload({ path });
@@ -1716,7 +1716,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         await this.client.filesDeleteV2({ path });
@@ -1737,7 +1737,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         this.logger.log(
@@ -1809,7 +1809,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         const result = await this.client.filesDownload({ path });
@@ -1830,7 +1830,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         const result = await this.client.filesCopyV2({
@@ -1867,7 +1867,7 @@ if (window.typingMindCloudSync) {
 
       if (this.auth) {
         const accessToken = await this.auth.getValidToken();
-        this.client = new Dropbox({ accessToken, fetch });
+        this.client = new Dropbox.Dropbox({ accessToken, fetch });
       }
 
       // Start batch copy
@@ -1914,7 +1914,7 @@ if (window.typingMindCloudSync) {
 
         if (this.auth) {
           const accessToken = await this.auth.getValidToken();
-          this.client = new Dropbox({ accessToken, fetch });
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
         }
 
         // Check job status
@@ -1965,7 +1965,7 @@ if (window.typingMindCloudSync) {
 
       if (this.auth) {
         const accessToken = await this.auth.getValidToken();
-        this.client = new Dropbox({ accessToken, fetch });
+        this.client = new Dropbox.Dropbox({ accessToken, fetch });
       }
 
       // Start batch delete
