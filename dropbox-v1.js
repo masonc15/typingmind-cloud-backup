@@ -1513,6 +1513,35 @@ if (window.typingMindCloudSync) {
     }
 
     /**
+     * Verify Dropbox connection without listing files
+     * This is much faster than listing files - just checks account access
+     */
+    async verifyConnection() {
+      try {
+        await this.withRetry(async () => {
+          if (this.auth) {
+            const accessToken = await this.auth.getValidToken();
+            this.client = new Dropbox.Dropbox({ accessToken, fetch });
+          }
+
+          // Use the account info endpoint to verify access
+          // This is lightweight and doesn't require listing any files
+          await this.client.usersGetCurrentAccount();
+
+          this.logger.log("success", "Dropbox connection verified");
+          return true;
+        }, 1); // Only 1 retry for verification
+      } catch (error) {
+        this.logger.log(
+          "error",
+          "Dropbox verification failed",
+          this.extractErrorDetails(error)
+        );
+        throw error;
+      }
+    }
+
+    /**
      * Retry wrapper for Dropbox operations
      * @param {Function} operation - Async function to retry
      * @param {number} maxRetries - Maximum retry attempts
@@ -5008,7 +5037,7 @@ if (window.typingMindCloudSync) {
           return;
         }
 
-        // Verify Dropbox connection by attempting to list root
+        // Verify Dropbox connection using lightweight account check (not listing files)
         const tempConfigManager = {
           config: { ...this.config.config, ...newConfig },
           get: function (key) {
@@ -5023,7 +5052,7 @@ if (window.typingMindCloudSync) {
           this.dropboxAuth
         );
         await tempDropboxService.initialize();
-        await tempDropboxService.list("");
+        await tempDropboxService.verifyConnection();
         actionMsg.textContent =
           "✅ Dropbox connection verified! Saving configuration...";
         actionMsg.style.color = "#22c55e";
