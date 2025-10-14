@@ -3154,7 +3154,6 @@ if (window.typingMindCloudSync) {
     }
   }
   class BackupService {
-  class BackupService {
     constructor(dataService, s3Service, logger) {
       this.dataService = dataService;
       this.s3Service = s3Service;
@@ -4048,7 +4047,6 @@ if (window.typingMindCloudSync) {
       this.clearLeaderTimeout();
     }
   }
-  class CloudSyncApp {
   class CloudSyncApp {
     constructor() {
       this.logger = new Logger();
