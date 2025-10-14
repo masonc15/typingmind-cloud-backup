@@ -2944,7 +2944,12 @@ if (window.typingMindCloudSync) {
         }
         return { metadata, etag };
       } catch (error) {
+        // Handle S3 not found errors
         if (error.code === "NoSuchKey" || error.statusCode === 404) {
+          return { metadata: { lastSync: 0, items: {} }, etag: null };
+        }
+        // Handle Dropbox not found errors (status 409 with path/not_found)
+        if (error.status === 409 && error.error?.path?.[".tag"] === "not_found") {
           return { metadata: { lastSync: 0, items: {} }, etag: null };
         }
         throw error;
@@ -5301,7 +5306,9 @@ if (window.typingMindCloudSync) {
       return metadata;
     }
     cleanup() {
-      this.logger.log("info", "🧹 Starting comprehensive cleanup");
+      if (this.logger) {
+        this.logger.log("info", "🧹 Starting comprehensive cleanup");
+      }
       if (this.autoSyncInterval) {
         clearInterval(this.autoSyncInterval);
         this.autoSyncInterval = null;
@@ -5338,7 +5345,9 @@ if (window.typingMindCloudSync) {
       if (this.syncOrchestrator) {
         this.syncOrchestrator.cleanup();
       }
-      this.logger.log("success", "✅ Cleanup completed");
+      if (this.logger) {
+        this.logger.log("success", "✅ Cleanup completed");
+      }
       this.config = null;
       this.dataService = null;
       this.cryptoService = null;
