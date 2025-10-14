@@ -1433,6 +1433,15 @@ if (window.typingMindCloudSync) {
       // Initialize Dropbox client
       this.client = new Dropbox.Dropbox({ accessToken, fetch });
 
+      // Ensure required folders exist (Dropbox requires explicit folder creation)
+      try {
+        await this.createFolder("items");
+        await this.createFolder("backups");
+      } catch (error) {
+        // Folders might already exist, which is fine
+        this.logger.log("info", "Folders already exist or creation skipped");
+      }
+
       this.logger.log("success", "Dropbox client initialized");
     }
 
@@ -1870,6 +1879,41 @@ if (window.typingMindCloudSync) {
 
         this.logger.log("success", `Copied ${sourceKey} → ${destinationKey}`);
         return result.result.metadata;
+      });
+    }
+
+    /**
+     * Create a folder in Dropbox
+     * Dropbox requires folders to exist before files can be placed in them
+     * @param {string} folderPath - Path to the folder to create
+     * @returns {Promise<object>} - Folder metadata
+     */
+    async createFolder(folderPath) {
+      return this.withRetry(async () => {
+        const path = this.toDropboxPath(folderPath);
+
+        if (this.auth) {
+          const accessToken = await this.auth.getValidToken();
+          this.client = new Dropbox.Dropbox({ accessToken, fetch });
+        }
+
+        try {
+          const result = await this.client.filesCreateFolderV2({
+            path: path,
+            autorename: false,
+          });
+
+          this.logger.log("success", `Created folder: ${folderPath}`);
+          return result.result.metadata;
+        } catch (error) {
+          // Ignore error if folder already exists (409 with path/conflict/folder)
+          if (error.status === 409 && error.error?.error?.['.tag'] === 'path' &&
+              error.error?.error?.conflict?.['.tag'] === 'folder') {
+            this.logger.log("info", `Folder already exists: ${folderPath}`);
+            return { path: path };
+          }
+          throw error;
+        }
       });
     }
 
@@ -3271,6 +3315,10 @@ if (window.typingMindCloudSync) {
       )}-${timestamp}`;
 
       try {
+        // Create the backup folder first (required for Dropbox)
+        await this.s3Service.createFolder(backupFolder);
+        this.logger.log("success", `Created snapshot folder: ${backupFolder}`);
+
         const itemsList = await this.s3Service.list("items/");
         this.logger.log(
           "info",
@@ -3377,6 +3425,10 @@ if (window.typingMindCloudSync) {
       const backupFolder = `backups/typingmind-backup-${dateString}`;
 
       try {
+        // Create the backup folder first (required for Dropbox)
+        await this.s3Service.createFolder(backupFolder);
+        this.logger.log("success", `Created daily backup folder: ${backupFolder}`);
+
         const itemsList = await this.s3Service.list("items/");
         this.logger.log(
           "info",
